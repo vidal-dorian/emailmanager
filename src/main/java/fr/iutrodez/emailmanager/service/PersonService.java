@@ -1,6 +1,7 @@
 package fr.iutrodez.emailmanager.service;
 
 import fr.iutrodez.emailmanager.model.Person;
+import org.springframework.stereotype.Service;
 import tools.jackson.core.JacksonException;
 import tools.jackson.databind.ObjectMapper;
 
@@ -8,6 +9,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+@Service
 public class PersonService {
 
     private static final String FILE_PATH = "persons.json";
