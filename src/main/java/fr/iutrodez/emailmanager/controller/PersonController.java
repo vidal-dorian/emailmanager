@@ -4,33 +4,66 @@ import fr.iutrodez.emailmanager.model.Person;
 import fr.iutrodez.emailmanager.service.PersonService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.io.IOException;
 
 @Controller
-public class PersonController {
+@RequestMapping("/")
+class PersonController {
 
-    // Déclaration du service
     private final PersonService personService;
 
-    // Injection du service dans le controller par défaut
     public PersonController(PersonService personService) {
         this.personService = personService;
     }
 
     @GetMapping("/")
     public String listPersons(Model model) {
-        // Récupère toutes les personnes depuis le service
-        List<Person> listePersonnes = this.personService.getAllPersons();
-
-        // C'est un ensemble clé - valeur, la clé doit être la meme que dans
-        // la vue
-        model.addAttribute("persons", listePersonnes);
-
-        // Pas besoin de mettre 'list.html', il comprend tout seul le '.html'
+        model.addAttribute("persons", personService.getAllPersons());
         return "list";
     }
 
+    @GetMapping("/delete/{id}")
+    public String deletePerson(@PathVariable int id) throws IOException {
+        personService.deletePerson(id);
+        return "redirect:/";
+    }
+
+    @GetMapping("/view/{id}")
+    public String viewPerson(@PathVariable int id, Model model) {
+        Person person = personService.getPersonById(id);
+        model.addAttribute("person", person);
+        return "view";
+    }
+
+    @GetMapping("/add")
+    public String addPersonForm(Model model) {
+        model.addAttribute("person", new Person());
+        return "add";
+    }
+
+    @PostMapping("/add")
+    public String addPerson(@ModelAttribute Person person) throws IOException {
+        personService.addPerson(person);
+        return "redirect:/";
+    }
+
+    @GetMapping("/edit/{id}")
+    public String editPersonForm(@PathVariable int id, Model model) {
+        Person person = personService.getPersonById(id);
+        model.addAttribute("person", person);
+        return "edit";
+    }
+
+    @PostMapping("/edit")
+    public String editPerson(@ModelAttribute Person person) throws IOException {
+        personService.updatePerson(person);
+        return "redirect:/";
+    }
+
+    @ExceptionHandler(IOException.class)
+    public String handleIOException(IOException ex) {
+        return "error_data";
+    }
 }
