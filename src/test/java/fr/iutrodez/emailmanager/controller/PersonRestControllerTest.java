@@ -1,13 +1,16 @@
-package fr.iutrodez.emailmanager.controller; // adapte au package de ton contrôleur
+package fr.iutrodez.emailmanager.controller;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 
+import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request
         .MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request
@@ -16,15 +19,24 @@ import static org.springframework.test.web.servlet.result
         .MockMvcResultMatchers.status;
 
 @SpringBootTest
-@AutoConfigureMockMvc
 class PersonRestControllerTest {
+
+    @Autowired
+    private WebApplicationContext context;
+
+    private MockMvc mockMvc;
+
+    @BeforeEach
+    void setUp() {
+        mockMvc = MockMvcBuilders
+                .webAppContextSetup(context)
+                .apply(springSecurity())
+                .build();
+    }
 
     private static final String URL = "/api/personnes";
     private static final String JSON_PERSONNE
-            = "{\"nom\":\"Dupont\",\"prenom\":\"Jean\"}";
-
-    @Autowired
-    private MockMvc mockMvc;
+            = "{\"id\":0,\"nom\":\"Dupont\",\"prenom\":\"Jean\"}";
 
     // Pour une personne non authentifiée, elle ne peut pas accéder à l'API
     @Test
